@@ -221,9 +221,9 @@ def extract_rfc_citations(text: str, rfc: str) -> List[str]:
     return results
 
 def calc_toplist():
-    f = open("dot/top_reved_by.html", "w")
+    f = open("dot/top_refed_by.html", "w")
     
-    with open("templates/top_reved_by_header.html", "r", encoding="utf-8") as h:
+    with open("templates/top_refed_by_header.html", "r", encoding="utf-8") as h:
         f.write(h.read())
     
     ar = []
@@ -236,7 +236,7 @@ def calc_toplist():
     ar.sort(reverse=True)
     f.write("\n".join(ar))
 
-    with open("templates/top_reved_by_footer.html", "r", encoding="utf-8") as h:
+    with open("templates/top_refed_by_footer.html", "r", encoding="utf-8") as h:
         f.write(h.read())
 
     f.close()
