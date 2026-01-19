@@ -199,7 +199,31 @@ def get_citations(rfc: str) -> List[str]:
         print("Could not open %s" % rfc.lower())
         return []
 
-        
+def extract_rfc_citations_with_counts(text: str) -> List[tuple[str, int]]:
+    """
+    Extract RFC citations from bracketed references and count how often each RFC
+    is cited.
+
+    Examples handled:
+      [RFC1234]
+      [RFC 1234]
+      [RFC1234, RFC2345, rfc 3456]
+
+    Returns:
+      [('RFC1234', 4), ('RFC2345', 1), ('RFC3456', 3)]
+    Order is first appearance in the text.
+    """
+    counts = OrderedDict()
+
+    for m in _BRACKET_WITH_RFC.finditer(text):
+        inside = m.group(1)
+        for num in _RFC_TOKEN.findall(inside):
+            rfc = f"RFC{int(num)}"  # normalize case & leading zeros
+            counts[rfc] = counts.get(rfc, 0) + 1
+
+    return list(counts.items())
+
+
 def extract_rfc_citations(text: str, rfc: str) -> List[str]:
     """
     Extract RFC citations only from bracketed blocks like:
