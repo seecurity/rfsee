@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Offline sortable table (minimal)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; }
+    th { cursor: pointer; user-select: none; background: #f6f6f6; position: sticky; top: 0; }
+    th[aria-sort="ascending"]::after { content: " ▲"; }
+    th[aria-sort="descending"]::after { content: " ▼"; }
+    tbody tr:nth-child(even) { background: #fafafa; }
+  </style>
+</head>
+<body>
+
+<h1>Most referenced RFCs</h1>
+<p><a href="index.html">Got back to RFSee search.</a></p>
+
+<table id="tbl">
+  <thead>
+    <tr>
+      <!-- Add data-type="number" for numeric sorting; omit for text -->
+      <th>RFC</th>
+      <th>Title</th>
+      <th data-type="number">Cited by # RFCs</th>
+    </tr>
+  </thead>
+  <tbody>
+

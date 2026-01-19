@@ -222,39 +222,10 @@ def extract_rfc_citations(text: str, rfc: str) -> List[str]:
 
 def calc_toplist():
     f = open("dot/top_reved_by.html", "w")
-    f.write("""
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Offline sortable table (minimal)</title>
-  <style>
-    body { font-family: system-ui, sans-serif; padding: 16px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 6px 8px; }
-    th { cursor: pointer; user-select: none; background: #f6f6f6; position: sticky; top: 0; }
-    th[aria-sort="ascending"]::after { content: " ▲"; }
-    th[aria-sort="descending"]::after { content: " ▼"; }
-    tbody tr:nth-child(even) { background: #fafafa; }
-  </style>
-</head>
-<body>
-
-<h1>Most referenced RFCs</h1>
-<p><a href="index.html">Got back to RFSee search.</a></p>
-
-<table id="tbl">
-  <thead>
-    <tr>
-      <!-- Add data-type="number" for numeric sorting; omit for text -->
-      <th>RFC</th>
-      <th>Title</th>
-      <th data-type="number">Cited by # RFCs</th>
-    </tr>
-  </thead>
-  <tbody>
- \n""")
+    
+    with open("templates/top_reved_by_header.html", "r", encoding="utf-8") as h:
+        f.write(h.read())
+    
     ar = []
     for rfc in RFC_INFO.keys():
         if len(RFC_INFO[rfc]) != 4:
@@ -264,86 +235,10 @@ def calc_toplist():
 
     ar.sort(reverse=True)
     f.write("\n".join(ar))
-    f.write("""
-  </tbody>
-</table>
 
-<script>
-(() => {
-  const table = document.getElementById("tbl");
-  const thead = table.tHead;
-  const tbody = table.tBodies[0];
+    with open("templates/top_reved_by_footer.html", "r", encoding="utf-8") as h:
+        f.write(h.read())
 
-  let lastCol = -1;
-  let lastDir = 1; // 1 = ascending, -1 = descending
-
-  function getCellValue(row, colIndex) {
-    return row.cells[colIndex]?.textContent.trim() ?? "";
-  }
-
-  function compare(a, b, type) {
-    if (type === "number") {
-      const na = Number(a.replace(/,/g, "")); // allow "1,234"
-      const nb = Number(b.replace(/,/g, ""));
-      // Handle NaN by pushing them to the end
-      if (Number.isNaN(na) && Number.isNaN(nb)) return 0;
-      if (Number.isNaN(na)) return 1;
-      if (Number.isNaN(nb)) return -1;
-      return na - nb;
-    }
-    // Text compare (case-insensitive, locale-aware)
-    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-  }
-
-  function clearAriaSort() {
-    [...thead.rows[0].cells].forEach(th => th.removeAttribute("aria-sort"));
-  }
-
-  thead.addEventListener("click", (e) => {
-    const th = e.target.closest("th");
-    if (!th) return;
-
-    const colIndex = th.cellIndex;
-    const type = th.dataset.type || "text";
-
-    // Toggle sort direction if clicking same column; otherwise start ascending
-    const dir = (colIndex === lastCol) ? -lastDir : 1;
-
-    const rows = [...tbody.rows];
-
-    // Stable sort: tie-break by original order (index)
-    const indexed = rows.map((row, i) => ({ row, i }));
-    indexed.sort((ra, rb) => {
-      const av = getCellValue(ra.row, colIndex);
-      const bv = getCellValue(rb.row, colIndex);
-      const c = compare(av, bv, type);
-      return c !== 0 ? dir * c : ra.i - rb.i;
-    });
-
-    // Rebuild tbody
-    const frag = document.createDocumentFragment();
-    indexed.forEach(({ row }) => frag.appendChild(row));
-    tbody.appendChild(frag);
-
-    // Update state + header indicators
-    lastCol = colIndex;
-    lastDir = dir;
-    clearAriaSort();
-    th.setAttribute("aria-sort", dir === 1 ? "ascending" : "descending");
-  });
-})();
-</script>
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-  const table = document.getElementById("tbl");
-  const th = table.tHead.rows[0].cells[2]; // third column
-  th.click(); // first click = ascending
-  th.click(); // second click = descending
-});
-</script>
-</body>
-</html>
-""")
     f.close()
         
 
