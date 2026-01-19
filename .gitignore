@@ -1,1 +1,9 @@
+compile.sh
 zips/.DS_Store
+zips/*.txt
+zips/*.xml
+zips/*.tar
+zips/*.gz
+zips/xml/
+zips/a/
+dot/
