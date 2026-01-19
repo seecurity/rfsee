@@ -46,61 +46,10 @@ def get_sub_fields(elem, field_name) -> []:
 
 def write_index_html():
     f = open("dot/index.html", "w")
-    f.write("""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>RFSee RFC Browser</title>
 
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 700px;
-      margin: 2rem auto;
-      line-height: 1.6;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-
-    ul {
-      margin: 0.5rem 0 1.5rem;
-      padding-left: 1.2rem;
-    }
-
-    li {
-      margin: 0.25rem 0;
-    }
-
-    .jump-highlight {
-      outline: 3px solid #007acc;
-      outline-offset: 4px;
-    }
-
-    hr {
-      margin: 3rem 0;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>RFSee RFC Browser</h1>
-
-  <p>
-    Search for RFC numbers, names or years below and press Enter
-    or click a result.
-  </p>
-  <p>Top list of most referenced RFCs: <a href="top_reved_by.html">here</a></p>
-
-  <!-- Search UI -->
-  <input id="search" placeholder="Search sections…" autocomplete="off" />
-  <ul id="results"></ul>
-
-  <hr>
-""")
+    # Write header
+    with open("templates/index_head.html", "r", encoding="utf-8") as h:
+        f.write(h.read())
 
     for rfc in RFC_INFO.keys():
         title = RFC_INFO[rfc][0].replace("\n", " ")
@@ -108,87 +57,10 @@ def write_index_html():
 <h4 id="%s">%s</h4>
 <p><a href="%s.html" data-tile="%s">%s -- %s</a></p>\n""" % (rfc, rfc + " -- " + title, rfc, rfc + " -- " + title, rfc, title))
 
-    f.write("""  <!-- JavaScript -->
-  <script>
-  (() => {
-    const input = document.getElementById("search");
-    const results = document.getElementById("results");
+    # Write footer
+    with open("templates/index_footer.html", "r", encoding="utf-8") as h:
+        f.write(h.read())
 
-    // Collect headings with IDs
-    const candidates = [];
-    document
-      .querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]")
-      .forEach(h => {
-        candidates.push({
-          id: h.id,
-          label: h.textContent.trim(),
-          el: h
-        });
-      });
-
-    function clearResults() {
-      results.innerHTML = "";
-    }
-
-    function highlightAndScroll(el, id) {
-      history.pushState(null, "", "#" + encodeURIComponent(id));
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      el.classList.add("jump-highlight");
-      setTimeout(() => el.classList.remove("jump-highlight"), 1200);
-    }
-
-    function render(matches) {
-      clearResults();
-      for (const m of matches.slice(0, 15)) {
-        const li = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = "#" + encodeURIComponent(m.id);
-        link.textContent = m.label;
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          highlightAndScroll(m.el, m.id);
-          clearResults();
-        });
-        li.appendChild(link);
-        results.appendChild(li);
-      }
-    }
-
-    function search(q) {
-      q = q.trim().toLowerCase();
-      if (!q) {
-        clearResults();
-        return;
-      }
-
-      const matches = candidates
-        .map(c => {
-          const hay = (c.label + " " + c.id).toLowerCase();
-          const idx = hay.indexOf(q);
-          return { ...c, score: idx === -1 ? Infinity : idx };
-        })
-        .filter(x => x.score !== Infinity)
-        .sort((a, b) => a.score - b.score || a.label.length - b.label.length);
-
-      render(matches);
-    }
-
-    input.addEventListener("input", () => search(input.value));
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const first = results.querySelector("a");
-        if (first) first.click();
-      } else if (e.key === "Escape") {
-        clearResults();
-        input.blur();
-      }
-    });
-  })();
-  </script>
-
-</body>
-</html> """)
     f.close()
 
 def write_dot_src(rfc, month, year, obs_ids, obs_by_ids, updates, updated_by):

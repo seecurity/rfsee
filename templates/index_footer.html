@@ -1,0 +1,83 @@
+
+  <!-- JavaScript -->
+  <script>
+  (() => {
+    const input = document.getElementById("search");
+    const results = document.getElementById("results");
+
+    // Collect headings with IDs
+    const candidates = [];
+    document
+      .querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]")
+      .forEach(h => {
+        candidates.push({
+          id: h.id,
+          label: h.textContent.trim(),
+          el: h
+        });
+      });
+
+    function clearResults() {
+      results.innerHTML = "";
+    }
+
+    function highlightAndScroll(el, id) {
+      history.pushState(null, "", "#" + encodeURIComponent(id));
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.classList.add("jump-highlight");
+      setTimeout(() => el.classList.remove("jump-highlight"), 1200);
+    }
+
+    function render(matches) {
+      clearResults();
+      for (const m of matches.slice(0, 15)) {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = "#" + encodeURIComponent(m.id);
+        link.textContent = m.label;
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          highlightAndScroll(m.el, m.id);
+          clearResults();
+        });
+        li.appendChild(link);
+        results.appendChild(li);
+      }
+    }
+
+    function search(q) {
+      q = q.trim().toLowerCase();
+      if (!q) {
+        clearResults();
+        return;
+      }
+
+      const matches = candidates
+        .map(c => {
+          const hay = (c.label + " " + c.id).toLowerCase();
+          const idx = hay.indexOf(q);
+          return { ...c, score: idx === -1 ? Infinity : idx };
+        })
+        .filter(x => x.score !== Infinity)
+        .sort((a, b) => a.score - b.score || a.label.length - b.label.length);
+
+      render(matches);
+    }
+
+    input.addEventListener("input", () => search(input.value));
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const first = results.querySelector("a");
+        if (first) first.click();
+      } else if (e.key === "Escape") {
+        clearResults();
+        input.blur();
+      }
+    });
+  })();
+  </script>
+
+</body>
+</html> 
+

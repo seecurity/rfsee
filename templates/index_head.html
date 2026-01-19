@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RFSee RFC Browser</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: 2rem auto;
+      line-height: 1.6;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    ul {
+      margin: 0.5rem 0 1.5rem;
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin: 0.25rem 0;
+    }
+
+    .jump-highlight {
+      outline: 3px solid #007acc;
+      outline-offset: 4px;
+    }
+
+    hr {
+      margin: 3rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>RFSee RFC Browser</h1>
+
+  <p>
+    Search for RFC numbers, names or years below and press Enter
+    or click a result.
+  </p>
+  <p>Top list of most referenced RFCs: <a href="top_reved_by.html">here</a></p>
+
+  <!-- Search UI -->
+  <input id="search" placeholder="Search sections…" autocomplete="off" />
+  <ul id="results"></ul>
+
+  <hr>
+
